@@ -1,12 +1,12 @@
 start:
-	docker compose up -d bot
+	docker compose up -d --build bot
 
 stop:
 	docker compose down
 
 restart:
 	docker compose down
-	docker compose up -d bot
+	docker compose up -d --build bot
 
 deploy:
 	docker compose run --rm deploy
