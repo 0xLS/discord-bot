@@ -1,22 +1,43 @@
-import { Events, ChatInputCommandInteraction } from 'discord.js';
+import {
+	Events,
+	EmbedBuilder
+} from 'discord.js';
 
 export = {
 	name: Events.InteractionCreate,
 
-	async execute(interaction: ChatInputCommandInteraction) {
-		if (!interaction.isChatInputCommand()) return;
+	async execute(interaction: any) {
 
-		const command = interaction.client.commands.get(interaction.commandName);
-		if (!command) return;
+		// -----------------------------
+		// Slash commands
+		// -----------------------------
+		if (interaction.isChatInputCommand()) {
+			const command = interaction.client.commands.get(interaction.commandName);
+			if (!command) return;
 
-		try {
 			await command.execute(interaction);
-		} catch (error) {
-			console.error(error);
+			return;
+		}
+
+		// -----------------------------
+		// Modal submit
+		// -----------------------------
+		if (interaction.isModalSubmit()) {
+			if (interaction.customId !== 'embedModal') return;
+
+			const title = interaction.fields.getTextInputValue('embedTitle');
+			const description = interaction.fields.getTextInputValue('embedDescription');
+
+			const embed = new EmbedBuilder()
+				.setTitle(title)
+				.setDescription(description)
+				.setColor(0x5865F2)
+				.setFooter({ text: `Created by ${interaction.user.username}` })
+				.setTimestamp();
+
 			await interaction.reply({
-				content: 'Something broke 💥',
-				ephemeral: true,
+				embeds: [embed]
 			});
 		}
-	},
+	}
 };

@@ -1,41 +1,41 @@
 import {
 	SlashCommandBuilder,
-	EmbedBuilder,
-	ChatInputCommandInteraction
+	ChatInputCommandInteraction,
+	ModalBuilder,
+	TextInputBuilder,
+	TextInputStyle,
+	ActionRowBuilder
 } from 'discord.js';
 
 import { Command } from '../types/command';
 
 const data = new SlashCommandBuilder()
 	.setName('embed')
-	.setDescription('Create a custom embed message')
-	.addStringOption(option =>
-		option
-			.setName('title')
-			.setDescription('Title of the embed')
-			.setRequired(true)
-	)
-	.addStringOption(option =>
-		option
-			.setName('description')
-			.setDescription('Description of the embed')
-			.setRequired(true)
-	);
+	.setDescription('Open embed builder');
 
 const execute = async (interaction: ChatInputCommandInteraction) => {
-	const title = interaction.options.getString('title', true);
-	const description = interaction.options.getString('description', true);
+	const modal = new ModalBuilder()
+		.setCustomId('embedModal')
+		.setTitle('Embed Builder');
 
-	const embed = new EmbedBuilder()
-		.setTitle(title)
-		.setDescription(description)
-		.setColor(0x5865F2)
-		.setFooter({ text: `Created by ${interaction.user.username}` })
-		.setTimestamp();
+	const titleInput = new TextInputBuilder()
+		.setCustomId('embedTitle')
+		.setLabel('Title')
+		.setStyle(TextInputStyle.Short)
+		.setRequired(true);
 
-	await interaction.reply({
-		embeds: [embed]
-	});
+	const descriptionInput = new TextInputBuilder()
+		.setCustomId('embedDescription')
+		.setLabel('Description')
+		.setStyle(TextInputStyle.Paragraph)
+		.setRequired(true);
+
+	const titleRow = new ActionRowBuilder<TextInputBuilder>().addComponents(titleInput);
+	const descRow = new ActionRowBuilder<TextInputBuilder>().addComponents(descriptionInput);
+
+	modal.addComponents(titleRow, descRow);
+
+	await interaction.showModal(modal);
 };
 
 const command: Command = {
