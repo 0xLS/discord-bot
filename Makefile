@@ -1,8 +1,15 @@
+start:
+	docker compose up -d bot
+
+stop:
+	docker compose down
+
+restart:
+	docker compose down
+	docker compose up -d bot
+
 deploy:
 	docker compose run --rm deploy
 
-start:
-	docker compose up bot
-
-build:
-	docker build -t discord-bot .
+logs:
+	docker logs -f discord-bot
